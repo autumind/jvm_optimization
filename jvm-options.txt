@@ -1,0 +1,69 @@
+-server
+# 相同以避免JVM反复重新申请内存，Xmx 的大小约等于系统内存大小的一半，即充分利用系统资源，又给予系统安全运行的空间。
+-Xmx[half of total memory]
+-Xms[half of total memory]
+
+#此值对系统性能影响较大，Sun官方推荐配置年轻代大小为整个堆的3/8。
+-Xmn[3/8 heap]
+
+# 设置较小的线程栈以支持创建更多的线程，支持海量访问，并提升系统性能。
+-Xss128k
+
+# -XX:SurvivorRatio=6
+
+# -XX:MaxPermSize=256m
+
+# 配置并行收集器的线程数，即同时8个线程一起进行垃圾回收。此值一般配置为与CPU数目相等。
+-XX:ParallelGCThreads=[core numbers]
+
+# -XX:MaxTenuringThreshold=0 
+
+# 设置年老代为并发收集。CMS（ConcMarkSweepGC）收集的目标是尽量减少应用的暂停时间，减少Full GC发生的几率，利用和应用程序线程并发的垃圾回收线程来标记清除年老代内存，适用于应用中存在比较多的长生命周期对象的情况。
+-XX:+UseConcMarkSweepGC
+
+# 内存溢出生成dump
+-XX:+HeapDumpOnOutOfMemoryError
+
+# 内存溢出dump保存路径
+-XX:HeapDumpPath=/tmp/heapdump.hprof
+
+# 内存溢出自定义命令
+# -XX:OnOutOfMemoryError ="sh ~/xxx.sh"
+
+# 代码缓存大小设置（如果代码缓存被占满，JVM会打印出一条警告消息，并切换到interpreted-only 模式：JIT编译器被停用，字节码将不再会被编译成机器码。因此，应用程序将继续运行，但运行速度会降低一个数量级，直到有人注意到这个问题。）
+# -XX:InitialCodeCacheSize=[字节值]
+# -XX:ReservedCodeCacheSize=[字节值]
+
+# 当代码缓存被填满时让JVM放弃一些编译代码，可以避免JVM切换到interpreted-only 模式
+# -XX:+UseCodeCacheFlushing
+
+-Xloggc:路径包含文件名
+-XX:+PrintGCApplicationStoppedTime
+-XX:+PrintGCDateStamps
+-XX:+PrintGCDetails
+
+
+# -XX:+PrintSafepointStatistics
+# -XX:PrintSafepointStatisticsCount=1
+# 停顿时间
+-XX:+PrintGCApplicationConcurrentTime
+
+JAVA_OPTS="
+-Xms16384m 
+-Xmx16384m
+-Xss1024K
+-xmn6144m
+-XX:ParallelGCThreads=64
+-XX:+UseConcMarkSweepGC
+-XX:CMSInitiatingOccupancyFraction=75
+-XX:+UseCMSInitiatingOccupancyOnly
+-XX:+HeapDumpOnOutOfMemoryError
+-XX:HeapDumpPath=/home/dumpm.dump
+-XX:AutoBoxCacheMax=20000
+-XX:+ExplicitGCInvokesConcurrent 
+-XX:+UseBiasedLocking 
+-XX:+PrintGCApplicationStoppedTime 
+-XX:+PrintGCDateStamps 
+-XX:+PrintGCDetails 
+-XX:+PrintGCApplicationConcurrentTime 
+-Xloggc:/home/tomcat/logs/gc.log"
